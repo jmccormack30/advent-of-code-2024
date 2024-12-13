@@ -38,6 +38,12 @@ class Main {
         int rows = charArr.length;
         int cols = charArr[0].length;
 
+        Set<Cell> antinodes = getValuePart2(charCellMap, rows, cols);
+
+        return antinodes.size();
+    }
+
+    private static long getValue(Map<Character, Set<Cell>> charCellMap, int rows, int cols) {
         Set<Cell> antinodes = new HashSet<>();
 
         for (Set<Cell> cells : charCellMap.values()) {
@@ -57,6 +63,26 @@ class Main {
         return antinodes.size();
     }
 
+    private static Set<Cell> getValuePart2(Map<Character, Set<Cell>> charCellMap, int rows, int cols) {
+        Set<Cell> antinodes = new HashSet<>();
+
+        for (Set<Cell> cells : charCellMap.values()) {
+            List<Cell> list = new ArrayList<>(cells);
+
+            for (int i = 0; i < list.size(); i++) {
+                Cell c1 = list.get(i);
+                for (int j = i + 1; j < list.size(); j++) {
+                    Cell c2 = list.get(j);
+                    
+                    getAntiNodesPart2(c1, c2, rows, cols, antinodes);
+                    getAntiNodesPart2(c2, c1, rows, cols, antinodes);
+                }
+            }
+        }
+
+        return antinodes;
+    }
+
     private static void getAntiNodes(Cell c1, Cell c2, int rows, int cols, Set<Cell> antinodes) {
         int deltaX = c1.getCol() - c2.getCol();
         int deltaY = c1.getRow() - c2.getRow();
@@ -70,5 +96,23 @@ class Main {
         
         Cell cell = new Cell(newY, newX, null);
         antinodes.add(cell);
+    }
+
+    private static void getAntiNodesPart2(Cell c1, Cell c2, int rows, int cols, Set<Cell> antinodes) {
+        antinodes.add(new Cell(c1.getRow(), c1.getCol(), null));
+
+        int deltaX = c1.getCol() - c2.getCol();
+        int deltaY = c1.getRow() - c2.getRow();
+
+        int newX = c1.getCol() + deltaX;
+        int newY = c1.getRow() + deltaY;
+
+        while (newX >= 0 && newX < cols && newY >= 0 && newY < rows) {
+            Cell cell = new Cell(newY, newX, null);
+            antinodes.add(cell);
+
+            newX += deltaX;
+            newY += deltaY;
+        }
     }
 }
