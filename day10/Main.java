@@ -10,13 +10,8 @@ import java.util.stream.IntStream;
 class Main {
 	public static void main(String[] args) throws Exception {
         String fileName = "input.txt";
-
         BufferedReader br = new BufferedReader(new FileReader(fileName));
-        long value = decodeFile(br);
-        System.out.println("\nAnswer = " + value);
-    }
 
-    private static long decodeFile(BufferedReader br) throws Exception {
         int[][] arr = br.lines().map(String::toCharArray).map(Main::toIntArray).toArray(int[][]::new);
 
         int rows = arr.length;
@@ -27,8 +22,12 @@ class Main {
         addNeighbors(nodes, nodeMap, rows, cols);
 
         List<Node> trailHeads = nodes.stream().filter(n -> 0 == n.getNumber()).toList();
-        
-        return trailHeads.stream().mapToInt(Main::getScore).sum();
+
+        int score = trailHeads.stream().mapToInt(Main::getScore).sum();
+        int rating = trailHeads.stream().mapToInt(Main::getRating).sum();
+
+        System.out.println("Score = " + score);
+        System.out.println("Rating = " + rating);
     }
 
     private static int[] toIntArray(char[] charArr) {
@@ -93,5 +92,21 @@ class Main {
         }
         
         return trailEnds;
+    }
+
+    private static int getRating(Node node) {
+        int number = node.getNumber();
+
+        if (9 == number) return 1;
+
+        int rating = 0;
+
+        for (Node neighbor : node.getNodes()) {
+            if (number + 1 == neighbor.getNumber()) {
+                rating += getRating(neighbor);
+            }
+        }
+
+        return rating;
     }
 }
